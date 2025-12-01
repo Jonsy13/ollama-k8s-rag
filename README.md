@@ -81,8 +81,8 @@ A production-ready LLM agent that combines Retrieval Augmented Generation (RAG) 
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/yourusername/k8s-rag-agent.git
-cd k8s-rag-agent
+git clone https://github.com/Jonsy13/ollama-k8s-rag.git
+cd ollama-k8s-rag
 
 # Create virtual environment
 python -m venv venv
