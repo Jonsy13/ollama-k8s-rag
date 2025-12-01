@@ -551,29 +551,6 @@ kubectl exec -n llm-chaos -it <ollama-pod> -- ollama list
 
 ---
 
-## 🔒 Security Considerations
-
-1. **RBAC**: The agent has read-only access to cluster resources
-2. **Network Policies**: Consider adding NetworkPolicies to restrict pod communication
-3. **Secrets**: Use Kubernetes Secrets for sensitive configuration
-4. **API Authentication**: Add authentication for production deployments
-5. **Rate Limiting**: Implement rate limiting for external access
-
----
-
-## 🚀 Roadmap
-
-- [ ] Add support for more LLM providers (OpenAI, Anthropic, etc.)
-- [ ] Implement authentication and authorization
-- [ ] Add Prometheus metrics and Grafana dashboards
-- [ ] Support for more Kubernetes resources (Services, Ingress, etc.)
-- [ ] Implement streaming responses
-- [ ] Add conversation history and context management
-- [ ] Multi-tenancy support
-- [ ] Helm chart for easier deployment
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please follow these steps:
@@ -614,16 +591,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Qdrant](https://qdrant.tech/) - Vector database
 - [Kubernetes](https://kubernetes.io/) - Container orchestration
 - [MCP Protocol](https://github.com/anthropics/mcp) - Model Context Protocol
-
----
-
-## 📧 Contact
-
-For questions, issues, or suggestions:
-
-- **GitHub Issues**: [Create an issue](https://github.com/yourusername/k8s-rag-agent/issues)
-- **Email**: your.email@example.com
-- **Twitter**: [@yourusername](https://twitter.com/yourusername)
 
 ---
 
