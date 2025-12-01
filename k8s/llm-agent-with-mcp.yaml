@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-agent
+  namespace: llm-chaos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-agent
+  template:
+    metadata:
+      labels:
+        app: llm-agent
+    spec:
+      serviceAccountName: llm-agent-sa  # For K8s API access
+      containers:
+      # Main FastAPI LLM Agent
+      - name: agent
+        image: jonsy13/llm-sample-agent:latest
+        env:
+        - name: OLLAMA_URL
+          value: "http://ollama:11434/api/generate"
+        - name: QDRANT_URL
+          value: "http://qdrant:6333"
+        - name: MCP_SERVER_URL
+          value: "http://localhost:9000"  # MCP sidecar
+        ports:
+          - containerPort: 8000
+            name: http
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      
+      # MCP Server Sidecar
+      - name: mcp-server
+        image: jonsy13/llm-sample-agent:latest  # Same image, different command
+        command: ["python", "k8s_mcp_server.py"]
+        env:
+        - name: AGENT_URL
+          value: "http://localhost:8000"  # Can call main agent
+        ports:
+          - containerPort: 9000
+            name: mcp-stdio
+        resources:
+          requests:
+            cpu: "0.2"
+            memory: 256Mi
+          limits:
+            cpu: "0.5"
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-agent
+  namespace: llm-chaos
+spec:
+  selector:
+    app: llm-agent
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+    - name: mcp
+      port: 9000
+      targetPort: 9000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: llm-agent-sa
+  namespace: llm-chaos

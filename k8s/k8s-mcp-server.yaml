@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-mcp-server
+  namespace: llm-chaos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-mcp-server
+  template:
+    metadata:
+      labels:
+        app: k8s-mcp-server
+    spec:
+      serviceAccountName: llm-agent-sa  # Reuse the same SA
+      containers:
+      - name: mcp-server
+        image: jonsy13/llm-sample-agent:latest
+        command: ["python", "k8s_mcp_server.py"]
+        env:
+        - name: AGENT_URL
+          value: "http://llm-agent:8000"  # Can call main agent service
+        ports:
+          - containerPort: 9000
+            name: mcp-stdio
+        resources:
+          requests:
+            cpu: "0.2"
+            memory: 256Mi
+          limits:
+            cpu: "0.5"
+            memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8s-mcp-server
+  namespace: llm-chaos
+spec:
+  selector:
+    app: k8s-mcp-server
+  ports:
+    - name: mcp
+      port: 9000
+      targetPort: 9000
+  type: ClusterIP

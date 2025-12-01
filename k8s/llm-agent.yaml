@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-agent
+  namespace: llm-chaos
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: llm-agent
+  template:
+    metadata:
+      labels:
+        app: llm-agent
+    spec:
+      containers:
+      - name: agent
+        image: jonsy13/llm-sample-agent:latest
+        env:
+        - name: OLLAMA_URL
+          value: "http://ollama:11434/api/generate"
+        - name: QDRANT_URL
+          value: "http://qdrant:6333"
+        ports:
+          - containerPort: 8000
+        resources:
+          requests:
+            cpu: "0.5"
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-agent
+  namespace: llm-chaos
+spec:
+  selector:
+    app: llm-agent
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: ClusterIP
